@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>GPS 測試</title>
+    <script type="text/javascript">
+		let LAT_LONG_UNDEFINED = 181;
+		var lastLatitude = LAT_LONG_UNDEFINED;
+		var lastLongitude = LAT_LONG_UNDEFINED;
+
+		var pixelX;
+		var pixelY;
+
+		var enableDrawing = false;
+		var watchID;
+
+		if (navigator.geolocation) {
+			alert("GPS已被定位....千萬不可以動手!!!");
+			// 支援GPS地理定位
+			navigator.geolocation.getCurrentPosition(geoYes, geoNo);
+		} else {
+			alert("目前GPS無法定位....趕快補刀吧!!!");
+		}
+
+		function geoYes(evt) {
+			if (evt.coords == null) {
+				str = "evt.coords不存在";
+				document.getElementById("posStr").innerHTML = str;
+				return
+			}
+
+			str = "緯度" + evt.coords.latitude;
+			str += "<br />經度" + evt.coords.longitude;
+			str += "<br />精確度" + evt.coords.accuracy;
+			document.getElementById("posStr").innerHTML = str;
+
+			str = "http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=300x300&sensor=false&center=" + evt.coords.latitude + "," + evt.coords.longitude + "&markers=color:red%7C" + evt.coords.latitude + "," + evt.coords.longitude;
+			document.getElementById("map").src = str;
+
+			let DELTA_THRESHOLD = -1;
+
+			let dLat = evt.coords.latitude - lastLatitude;
+			let dLong = evt.coords.longitude - lastLongitude;
+
+			if (lastLatitude == LAT_LONG_UNDEFINED && lastLongitude == LAT_LONG_UNDEFINED) { // If lastlatitude and longitude are not more than 180 or less than -180, first time dLat and dLond would be huge number
+				lastlatitude = evt.coords.latitude;
+				lastLongitude = evt.coords.longitude;
+
+				pixelX = 150;
+				pixelY = 100;
+
+			} else if (enableDrawing && Math.abs(dLat) > DELTA_THRESHOLD && Math.abs(dLong) > DELTA_THRESHOLD) {
+				dLat = evt.coords.latitude - lastlatitude;
+				dLong = evt.coords.longitude - lastLongitude;
+
+				//This will make (dLatScaled, dLongScaled) >= (1,1)
+				let dLatAbs = Math.abs(dLat)
+				let dLongAbs = Math.abs(dLong)
+				var scalingFactor
+				console.log("test2")
+				if (dLatAbs == 0 && dLongAbs == 0) {
+					return
+				} else if (dLatAbs == 0 && dLongAbs != 0) {
+					scalingFactor == 1/dLongAbs
+				} else if (dLatAbs != 0 && dLongAbs == 0) {
+					scalingFactor = 1/dLatAbs
+				} else {
+					scalingFactor = 1/Math.min(dLatAbs, dLongAbs)
+				}
+
+				let dLatScaled = dLat * scalingFactor;
+				let dLongScaled = dLong * scalingFactor;
+
+				//use dLat, dLong to draw line on map
+				let canvas = document.getElementById("myCanvas");
+				if (canvas.getContext) {
+					var context = canvas.getContext("2d");
+
+					context.beginPath();
+					console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
+					context.moveTo(pixelX, pixelY);
+					pixelX += dLatScaled;
+					pixelY += dLatScaled;
+					console.log("...to (" + pixelX + ", " + pixelY + ")")
+					context.lineTo(pixelX, pixelY);
+					context.stroke()
+				}
+			}
+			lastlatitude = evt.coords.latitude;
+			lastLongitude = evt.coords.longitude;
+		}
+
+		function geoNo(evt) {
+			alert("GPS取得失敗");
+		}
+
+		function startGPS() {
+			enableDrawing = true;
+
+			watchID = navigator.geolocation.watchPosition(geoYes, geoNo);
+			document.getElementById("watchStr").innerHTML = "GPS正在監控中...";
+
+		}
+
+		function stopGPS() {
+			navigator.geolocation.clearWatch(watchID);
+			document.getElementById("watchStr").innerHTML = "GPS停止監控中...";
+		}
+	</script>
+    <style type="text/css">
+      canvas { border: 1px solid black; }
+    </style>
+  </head>
+  <body>
+    <h1>定位資訊 </h1>
+    <p id="posStr">111222</p>
+    <p id="watchStr">監控狀態</p>
+    <p>
+      <input type="button" value="啟動GPS更新" onClick="startGPS();">
+      <input type="button" value="停止GPS更新" onClick="stopGPS();">
+    </p>
+    <p>當啟動GPS更新,不用聯網也可持續更新!!!<br>
+      只要網頁開著!
+    </p>
+    <hr>
+    <p id = "posCoordinate">座標</p>
+    <p><img id="map"/></p>
+    <canvas id = "myCanvas" width="300" height="200"></canvas>
+  </body>
+</html>
