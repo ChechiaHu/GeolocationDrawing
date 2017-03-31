@@ -49,7 +49,9 @@
 				pixelX = 150;
 				pixelY = 100;
 
-			} else if (enableDrawing && Math.abs(dLat) > DELTA_THRESHOLD && Math.abs(dLong) > DELTA_THRESHOLD) {
+			} 
+
+			else if (enableDrawing && Math.abs(dLat) > DELTA_THRESHOLD && Math.abs(dLong) > DELTA_THRESHOLD) {
 				dLat = evt.coords.latitude - lastlatitude;
 				dLong = evt.coords.longitude - lastLongitude;
 
@@ -80,7 +82,7 @@
 					console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
 					context.moveTo(pixelX, pixelY);
 					pixelX += dLatScaled;
-					pixelY += dLatScaled;
+					pixelY += dLongScaled;
 					console.log("...to (" + pixelX + ", " + pixelY + ")")
 					context.lineTo(pixelX, pixelY);
 					context.stroke()
