@@ -47,8 +47,10 @@
 				lastlatitude = evt.coords.latitude;
 				lastLongitude = evt.coords.longitude;
 
-				pixelX = 150;
-				pixelY = 100;
+				let canvas = document.getElementById("myCanvas");
+
+				pixelX = canvas.width/2;
+				pixelY = canvas.height/2;
 
 			} 
 
@@ -131,6 +133,6 @@
     <hr>
     <p id = "posCoordinate">座標</p>
     <p><img id="map"/></p>
-    <canvas id = "myCanvas" width="300" height="200"></canvas>
+    <canvas id = "myCanvas" width="1000" height="1000"></canvas>
   </body>
 </html>
