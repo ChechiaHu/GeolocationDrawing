@@ -38,7 +38,7 @@
 			document.getElementById("map").src = str;
 
 			let DELTA_THRESHOLD_MIN = 0.00000001;
-			let DELTA_THRESHOLD_MAX = 0.01;
+			let DELTA_THRESHOLD_MAX = 0.0001;
 
 			let dLat = evt.coords.latitude - lastLatitude;
 			let dLong = evt.coords.longitude - lastLongitude;
@@ -58,7 +58,7 @@
 					 Math.abs(dLat) > DELTA_THRESHOLD_MIN && Math.abs(dLong) > DELTA_THRESHOLD_MIN &&
 					 Math.abs(dLat) < DELTA_THRESHOLD_MAX && Math.abs(dLong) < DELTA_THRESHOLD_MAX)
 			{
-				dLat = evt.coords.latitude - lastlatitude;
+				dLat = evt.coords.latitude - lastLatitude;
 				dLong = evt.coords.longitude - lastLongitude;
 
 				//This will make (dLatScaled, dLongScaled) >= (1,1)
