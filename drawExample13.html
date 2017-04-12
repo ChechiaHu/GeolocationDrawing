@@ -7,6 +7,9 @@
         var dataPoints = [];
         var standardDeviation = 0;
         let MAX_DATA_POINTS = 10;
+        var dLat;
+        var dLong;
+
         function addDataPoint(p) {
             if (dataPoints.size() > MAX_DATA_POINTS) {
                 dataPoints.shift() // Remove first (oldest) element
