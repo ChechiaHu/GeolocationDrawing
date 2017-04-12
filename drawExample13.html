@@ -4,12 +4,32 @@
     <meta charset="utf-8">
     <title>GPS 測試</title>
     <script type="text/javascript">
-		let LAT_LONG_UNDEFINED = 181;
-		var lastLatitude = LAT_LONG_UNDEFINED;
-		var lastLongitude = LAT_LONG_UNDEFINED;
+        var dataPoints = [];
+        var standardDeviation = 0;
+        let MAX_DATA_POINTS = 10;
+        function addDataPoint(p) {
+            if (dataPoints.size() > MAX_DATA_POINTS) {
+                dataPoints.shift() // Remove first (oldest) element
+            }
+            dataPoints.append(p); // Add new element
 
-		var pixelX;
-		var pixelY;
+            var meanSqDistance = 0;
+            var i;
+            for (i = 0; i < dataPoints.size(); ++i) {
+                meanSqDistance += dataPoints[i][0]*dataPoints[i][0] + dataPoints[i][1]*dataPoints[i][1];
+            }
+            meanSqDistance /= dataPoints.size();
+
+            var sdSq = 0;
+            for (i = 0; i < dataPoints.size(); ++i) {
+                let inner = (dataPoints[i][0]*dataPoints[i][0] + dataPoints[i][1]*dataPoints[i][1]) - meanSqDistance;
+                inner += inner*inner;
+            }
+            sdSq /= dataPoints.size();
+            standardDeviation = Math.sqrt(sdSq);
+        }
+
+        var lastPixel = [];
 
 		var enableDrawing = false;
 		var watchID;
@@ -17,13 +37,13 @@
 		if (navigator.geolocation) {
 			alert("GPS已被定位....千萬不可以動手!!!");
 			// 支援GPS地理定位
-			navigator.geolocation.getCurrentPosition(geoYes, geoNo);
+			navigator.geolocation.getCurrentPosition(geoYes, geoNo, { enableHighAccuracy: true, timeout: 500000 });
 		} else {
 			alert("目前GPS無法定位....趕快補刀吧!!!");
 		}
 
 		function geoYes(evt) {
-			if (evt.coords == null) {
+  			if (evt.coords == null) {
 				str = "evt.coords不存在";
 				document.getElementById("posStr").innerHTML = str;
 				return
@@ -34,68 +54,61 @@
 			str += "<br />精確度" + evt.coords.accuracy;
 			document.getElementById("posStr").innerHTML = str;
 
-			str = "http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=300x300&sensor=false&center=" + evt.coords.latitude + "," + evt.coords.longitude + "&markers=color:red%7C" + evt.coords.latitude + "," + evt.coords.longitude;
+			//str = "http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=300x300&sensor=false&center=" + evt.coords.latitude + "," + evt.coords.longitude;
+			str = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBdXkqR9RYuoAUstYgivrJsMMdukIWcBNQ&callback=initMap"
 			document.getElementById("map").src = str;
 
-			let DELTA_THRESHOLD_MIN = 0.00000001;
-			let DELTA_THRESHOLD_MAX = 0.0001;
+            let point = [evt.coords.latitude, evt.coords.longitude];
 
-			let dLat = evt.coords.latitude - lastLatitude;
-			let dLong = evt.coords.longitude - lastLongitude;
+			if (dataPoints.empty()) {
+                let canvas = document.getElementById("myCanvas");
+                let lastPixel = [canvas.width/2, canvas.height/2];
+                addDataPoint(point);
+                return;
+            }
 
-			if (lastLatitude == LAT_LONG_UNDEFINED && lastLongitude == LAT_LONG_UNDEFINED) { // If lastlatitude and longitude are not more than 180 or less than -180, first time dLat and dLond would be huge number
-				lastlatitude = evt.coords.latitude;
-				lastLongitude = evt.coords.longitude;
+            let distanceSq = point[0]*point[0] + point[1]*point[1];
+			if (dataPoints.size() === MAX_DATA_POINTS && (distanceSq / standardDeviation) < 3) {
+                addDataPoint(point);
 
-				let canvas = document.getElementById("myCanvas");
+                if (enableDrawing) {
+                    dLat = evt.coords.latitude - lastLatitude;
+                    dLong = evt.coords.longitude - lastLongitude;
 
-				pixelX = canvas.width/2;
-				pixelY = canvas.height/2;
+                    //This will make (dLatScaled, dLongScaled) >= (1,1)
+                    let dLatAbs = Math.abs(dLat);
+                    let dLongAbs = Math.abs(dLong);
+                    var scalingFactor = 0;
+                    if (dLatAbs === 0 && dLongAbs === 0) {
+                        return;
+                    } else if (dLatAbs === 0 && dLongAbs !== 0) {
+                        scalingFactor = 1 / dLongAbs;
+                    } else if (dLatAbs !== 0 && dLongAbs === 0) {
+                        scalingFactor = 1 / dLatAbs;
+                    } else {
+                        scalingFactor = 1 / Math.min(dLatAbs, dLongAbs);
+                    }
 
-			} 
+                    let dLatScaled = dLat * scalingFactor;
+                    let dLongScaled = dLong * scalingFactor;
+                    let newPixel = [lastPixel[0] + dLatScaled, lastPixel[1] + dLongScaled];
 
-			else if (enableDrawing && 
-					 Math.abs(dLat) > DELTA_THRESHOLD_MIN && Math.abs(dLong) > DELTA_THRESHOLD_MIN &&
-					 Math.abs(dLat) < DELTA_THRESHOLD_MAX && Math.abs(dLong) < DELTA_THRESHOLD_MAX)
-			{
-				dLat = evt.coords.latitude - lastLatitude;
-				dLong = evt.coords.longitude - lastLongitude;
+                    //use dLat, dLong to draw line on map
+                    let canvas = document.getElementById("myCanvas");
+                    if (canvas.getContext) {
+                        var context = canvas.getContext("2d");
 
-				//This will make (dLatScaled, dLongScaled) >= (1,1)
-				let dLatAbs = Math.abs(dLat)
-				let dLongAbs = Math.abs(dLong)
-				var scalingFactor
-				console.log("test2")
-				if (dLatAbs == 0 && dLongAbs == 0) {
-					return
-				} else if (dLatAbs == 0 && dLongAbs != 0) {
-					scalingFactor == 1/dLongAbs
-				} else if (dLatAbs != 0 && dLongAbs == 0) {
-					scalingFactor = 1/dLatAbs
-				} else {
-					scalingFactor = 1/Math.min(dLatAbs, dLongAbs)
-				}
+                        context.beginPath();
+                        console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
+                        context.moveTo(lastPixel[0], lastPixel[1]);
+                        console.log("...to (" + pixelX + ", " + pixelY + ")")
+                        context.lineTo(newPixel[0], newPixel[1]);
+                        context.stroke()
+                    }
 
-				let dLatScaled = dLat * scalingFactor;
-				let dLongScaled = dLong * scalingFactor;
-
-				//use dLat, dLong to draw line on map
-				let canvas = document.getElementById("myCanvas");
-				if (canvas.getContext) {
-					var context = canvas.getContext("2d");
-
-					context.beginPath();
-					console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
-					context.moveTo(pixelX, pixelY);
-					pixelX += dLatScaled;
-					pixelY += dLongScaled;
-					console.log("...to (" + pixelX + ", " + pixelY + ")")
-					context.lineTo(pixelX, pixelY);
-					context.stroke()
-				}
-			}
-			lastLatitude = evt.coords.latitude;
-			lastLongitude = evt.coords.longitude;
+                    lastPixel = newPixel;
+                }
+            }
 		}
 
 		function geoNo(evt) {
@@ -133,6 +146,6 @@
     <hr>
     <p id = "posCoordinate">座標</p>
     <p><img id="map"/></p>
-    <canvas id = "myCanvas" width="1000" height="1000"></canvas>
+    <canvas id = "myCanvas" width="500" height="500"></canvas>
   </body>
 </html>
