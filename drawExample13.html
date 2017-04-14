@@ -70,6 +70,7 @@
                 addDataPoint(point);
             }
 
+            let DELTA_MIN = 0.0000001; // TODO
             if (dataPoints.length > 1 && enableDrawing) {
 			    let lastDataPoint = dataPoints[dataPoints.length-2];
                 var dLat = evt.coords.latitude - lastDataPoint[0];
@@ -79,11 +80,11 @@
                 let dLatAbs = Math.abs(dLat);
                 let dLongAbs = Math.abs(dLong);
                 var scalingFactor = 0;
-                if (dLatAbs === 0 && dLongAbs === 0) {
+                if (dLatAbs < DELTA_MIN && dLongAbs < DELTA_MIN) {
                     return;
-                } else if (dLatAbs === 0 && dLongAbs !== 0) {
+                } else if (dLatAbs < DELTA_MIN && dLongAbs >= DELTA_MIN) {
                     scalingFactor = 1 / dLongAbs;
-                } else if (dLatAbs !== 0 && dLongAbs === 0) {
+                } else if (dLatAbs >= DELTA_MIN && dLongAbs < DELTA_MIN) {
                     scalingFactor = 1 / dLatAbs;
                 } else {
                     scalingFactor = 1 / Math.min(dLatAbs, dLongAbs);
