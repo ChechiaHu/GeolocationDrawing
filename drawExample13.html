@@ -7,32 +7,29 @@
         var dataPoints = [];
         var standardDeviation = 0;
         let MAX_DATA_POINTS = 10;
-        var dLat;
-        var dLong;
+        var lastPixel = [];
 
         function addDataPoint(p) {
-            if (dataPoints.size() > MAX_DATA_POINTS) {
+            if (dataPoints.length > MAX_DATA_POINTS) {
                 dataPoints.shift() // Remove first (oldest) element
             }
-            dataPoints.append(p); // Add new element
+            dataPoints.push(p); // Add new element
 
             var meanSqDistance = 0;
             var i;
-            for (i = 0; i < dataPoints.size(); ++i) {
+            for (i = 0; i < dataPoints.length; ++i) {
                 meanSqDistance += dataPoints[i][0]*dataPoints[i][0] + dataPoints[i][1]*dataPoints[i][1];
             }
-            meanSqDistance /= dataPoints.size();
+            meanSqDistance /= dataPoints.length;
 
             var sdSq = 0;
-            for (i = 0; i < dataPoints.size(); ++i) {
+            for (i = 0; i < dataPoints.length; ++i) {
                 let inner = (dataPoints[i][0]*dataPoints[i][0] + dataPoints[i][1]*dataPoints[i][1]) - meanSqDistance;
                 inner += inner*inner;
             }
-            sdSq /= dataPoints.size();
+            sdSq /= dataPoints.length;
             standardDeviation = Math.sqrt(sdSq);
         }
-
-        var lastPixel = [];
 
 		var enableDrawing = false;
 		var watchID;
@@ -45,8 +42,8 @@
 			alert("目前GPS無法定位....趕快補刀吧!!!");
 		}
 
-		function geoYes(evt) {
-  			if (evt.coords == null) {
+          function geoYes(evt) {
+  			if (evt.coords === null) {
 				str = "evt.coords不存在";
 				document.getElementById("posStr").innerHTML = str;
 				return
@@ -62,55 +59,54 @@
 			document.getElementById("map").src = str;
 
             let point = [evt.coords.latitude, evt.coords.longitude];
+            let distanceSq = point[0]*point[0] + point[1]*point[1];
 
-			if (dataPoints.empty()) {
+			if (dataPoints.length === 0) {
                 let canvas = document.getElementById("myCanvas");
-                let lastPixel = [canvas.width/2, canvas.height/2];
+                lastPixel = [canvas.width/2, canvas.height/2];
                 addDataPoint(point);
-                return;
+                firstPoint = true;
+            } else if (dataPoints.length < MAX_DATA_POINTS || (distanceSq / standardDeviation) < 3) {
+                addDataPoint(point);
             }
 
-            let distanceSq = point[0]*point[0] + point[1]*point[1];
-			if (dataPoints.size() === MAX_DATA_POINTS && (distanceSq / standardDeviation) < 3) {
-                addDataPoint(point);
+            if (dataPoints.length > 1 && enableDrawing) {
+			    let lastDataPoint = dataPoints[dataPoints.length-2];
+                var dLat = evt.coords.latitude - lastDataPoint[0];
+                var dLong = evt.coords.longitude - lastDataPoint[1];
 
-                if (enableDrawing) {
-                    dLat = evt.coords.latitude - lastLatitude;
-                    dLong = evt.coords.longitude - lastLongitude;
-
-                    //This will make (dLatScaled, dLongScaled) >= (1,1)
-                    let dLatAbs = Math.abs(dLat);
-                    let dLongAbs = Math.abs(dLong);
-                    var scalingFactor = 0;
-                    if (dLatAbs === 0 && dLongAbs === 0) {
-                        return;
-                    } else if (dLatAbs === 0 && dLongAbs !== 0) {
-                        scalingFactor = 1 / dLongAbs;
-                    } else if (dLatAbs !== 0 && dLongAbs === 0) {
-                        scalingFactor = 1 / dLatAbs;
-                    } else {
-                        scalingFactor = 1 / Math.min(dLatAbs, dLongAbs);
-                    }
-
-                    let dLatScaled = dLat * scalingFactor;
-                    let dLongScaled = dLong * scalingFactor;
-                    let newPixel = [lastPixel[0] + dLatScaled, lastPixel[1] + dLongScaled];
-
-                    //use dLat, dLong to draw line on map
-                    let canvas = document.getElementById("myCanvas");
-                    if (canvas.getContext) {
-                        var context = canvas.getContext("2d");
-
-                        context.beginPath();
-                        console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
-                        context.moveTo(lastPixel[0], lastPixel[1]);
-                        console.log("...to (" + pixelX + ", " + pixelY + ")")
-                        context.lineTo(newPixel[0], newPixel[1]);
-                        context.stroke()
-                    }
-
-                    lastPixel = newPixel;
+                //This will make (dLatScaled, dLongScaled) >= (1,1)
+                let dLatAbs = Math.abs(dLat);
+                let dLongAbs = Math.abs(dLong);
+                var scalingFactor = 0;
+                if (dLatAbs === 0 && dLongAbs === 0) {
+                    return;
+                } else if (dLatAbs === 0 && dLongAbs !== 0) {
+                    scalingFactor = 1 / dLongAbs;
+                } else if (dLatAbs !== 0 && dLongAbs === 0) {
+                    scalingFactor = 1 / dLatAbs;
+                } else {
+                    scalingFactor = 1 / Math.min(dLatAbs, dLongAbs);
                 }
+
+                let dLatScaled = dLat * scalingFactor;
+                let dLongScaled = dLong * scalingFactor;
+                let newPixel = [lastPixel[0] + dLatScaled, lastPixel[1] + dLongScaled];
+
+                //use dLat, dLong to draw line on map
+                let canvas = document.getElementById("myCanvas");
+                if (canvas.getContext) {
+                    var context = canvas.getContext("2d");
+
+                    context.beginPath();
+                   // console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
+                    context.moveTo(lastPixel[0], lastPixel[1]);
+                   // console.log("...to (" + pixelX + ", " + pixelY + ")")
+                    context.lineTo(newPixel[0], newPixel[1]);
+                    context.stroke()
+                }
+
+                lastPixel = newPixel;
             }
 		}
 
