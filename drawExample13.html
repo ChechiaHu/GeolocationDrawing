@@ -70,7 +70,7 @@
                 addDataPoint(point);
             }
 
-            let DELTA_MIN = 0.0000001; // TODO
+            let DELTA_MIN = 0.00001; // TODO
             if (dataPoints.length > 1 && enableDrawing) {
 			    let lastDataPoint = dataPoints[dataPoints.length-2];
                 var dLat = evt.coords.latitude - lastDataPoint[0];
