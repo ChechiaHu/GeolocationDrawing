@@ -25,7 +25,7 @@
             var sdSq = 0;
             for (i = 0; i < dataPoints.length; ++i) {
                 let inner = (dataPoints[i][0]*dataPoints[i][0] + dataPoints[i][1]*dataPoints[i][1]) - meanSqDistance;
-                inner += inner*inner;
+                sdSq += inner*inner;
             }
             sdSq /= dataPoints.length;
             standardDeviation = Math.sqrt(sdSq);
@@ -69,8 +69,11 @@
             } else if (dataPoints.length < MAX_DATA_POINTS || (distanceSq / standardDeviation) < 3) {
                 addDataPoint(point);
             }
+            else{
+			    return;
+            }
 
-            let DELTA_MIN = 0.00001; // TODO
+            let DELTA_MIN = 0.0000000000001; // TODO
             if (dataPoints.length > 1 && enableDrawing) {
 			    let lastDataPoint = dataPoints[dataPoints.length-2];
                 var dLat = evt.coords.latitude - lastDataPoint[0];
