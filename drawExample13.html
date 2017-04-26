@@ -82,15 +82,12 @@
 
 			if (gDataPoints.length === 0) {
                 let canvas = document.getElementById("myCanvas");
-                gLastPixel = [canvas.width/2, canvas.height/2];
-                addDataPoint(point);
-                firstPoint = true;
-            } else if (gDataPoints.length < MAX_DATA_POINTS || (distanceSq / gStandardDeviation) < 3) {
-                addDataPoint(point);
+                gLastPixel = [canvas.width / 2, canvas.height / 2];
             }
+            addDataPoint(point);
 
             let DELTA_MIN = 0.00001; // TODO
-            if (lastPoint !== undefined && enableDrawing) {
+            if (lastPoint !== undefined && enableDrawing && (distanceSq / gStandardDeviation) < 3) {
                 var dLat = evt.coords.latitude - lastPoint[0];
                 var dLong = evt.coords.longitude - lastPoint[1];
 
