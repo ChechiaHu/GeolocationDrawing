@@ -42,6 +42,8 @@
             }
             variance /= gDataPoints.length - 2;
             gStandardDeviation = Math.sqrt(variance);
+
+
         }
 
 		var enableDrawing = false;
@@ -87,7 +89,7 @@
             addDataPoint(point);
 
             let DELTA_MIN = 0.00001; // TODO
-            if (lastPoint !== undefined && enableDrawing && (distanceSq / gStandardDeviation) < 3) {
+            if (lastPoint !== undefined && enableDrawing && (distanceSq / Math.min(0, gStandardDeviation)) < 3) {
                 var dLat = evt.coords.latitude - lastPoint[0];
                 var dLong = evt.coords.longitude - lastPoint[1];
 
