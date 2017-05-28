@@ -14,11 +14,13 @@
     .demo {
       margin: 40px;
     }
-    .imgitem {
-      border: 1px black solid;
+    .imgitemcontainer {
       width: 23%;
       margin: 0 20px 20px 0;
       display: inline-block;
+    }
+    .imgitem {
+      border: 1px black solid;
     }
     .imgitem img {
       width: 100%;
@@ -33,7 +35,6 @@
   <p>
     <input type="button" value="啟動GPS更新" onClick="startGPS();">
     <input type="button" value="停止GPS更新" onClick="stopGPS();">
-    <input type="button" value="截圖" onClick="screenshot();">
   </p>
   <p>當啟動GPS更新,不用聯網也可持續更新!!!
     <br> 只要網頁開著!
@@ -43,11 +44,15 @@
   <p><img id="map" />
   </p>
   <canvas id="myCanvas" width="500" height="500"></canvas>
+  <p>
+    <input id="commentText" type="text">
+    <input type="button" value="儲存截圖" onClick="screenshot();">
+    <p id="screenshotButtonMsg"></p>
+  </p>
 
   <div class="savedImages">
     Files:
     <div id="savedImages">
-
     </div>
   </div>
 
