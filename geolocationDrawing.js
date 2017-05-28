@@ -38,7 +38,6 @@ function addDataPoint(p) {
     gStandardDeviation = Math.sqrt(variance);
 }
 
-var enableDrawing = false;
 var watchID;
 
 if (navigator.geolocation) {
@@ -81,7 +80,7 @@ if (navigator.geolocation) {
     addDataPoint(point);
 
     let DELTA_MIN = 0.00001; // TODO
-    if (lastPoint !== undefined && enableDrawing && (distanceSq / gStandardDeviation) < 3) {
+    if (lastPoint !== undefined && (distanceSq / gStandardDeviation) < 3) {
         var dLat = evt.coords.latitude - lastPoint[0];
         var dLong = evt.coords.longitude - lastPoint[1];
 
@@ -106,7 +105,7 @@ if (navigator.geolocation) {
         //use dLat, dLong to draw line on map
         let canvas = document.getElementById("myCanvas");
         if (canvas.getContext) {
-            var context = canvas.getContext("2d");
+            let context = canvas.getContext("2d");
 
             context.beginPath();
            // console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
@@ -125,8 +124,6 @@ function geoNo(evt) {
 }
 
 function startGPS() {
-	enableDrawing = true;
-
 	watchID = navigator.geolocation.watchPosition(geoYes, geoNo);
 	document.getElementById("watchStr").innerHTML = "GPS正在監控中...";
 
@@ -135,4 +132,20 @@ function startGPS() {
 function stopGPS() {
 	navigator.geolocation.clearWatch(watchID);
 	document.getElementById("watchStr").innerHTML = "GPS停止監控中...";
+}
+
+function clearMap() {
+    let canvas = document.getElementById("myCanvas");
+    if (canvas.getContext) {
+        let context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        
+        context.beginPath();
+        context.fillStyle = "#FFFFFF";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.closePath();
+
+        context.fill();
+
+    }
 }
