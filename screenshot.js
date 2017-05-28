@@ -1,3 +1,5 @@
+let MAX_COMMENT_LENGTH = 32;
+
 function pathJoin(parts, sep){
    var separator = sep || '/';
    var replace = new RegExp(separator+'{1,}', 'g');
@@ -17,32 +19,57 @@ function init() {
     });
 }
 
-function screenshot() {
-    var canvas  = document.getElementById("myCanvas");
+function screenshot() {    
+    var canvas = document.getElementById("myCanvas");
     var dataURL = canvas.toDataURL();
-    console.log("URL: " + dataURL);
+    var textBox = document.getElementById("commentText");
+    
+    let comment = (textBox.value === "") ? "無主旨" : textBox.value;
+    console.log(comment.length)
+    let msg = document.getElementById("screenshotButtonMsg");
+    if (comment.length > MAX_COMMENT_LENGTH) {
+        msg.innerHTML = "儲存失敗；註釋至多能有" + MAX_COMMENT_LENGTH + "個文字";
+        return;
+    } else if (comment.indexOf('.') != -1 || comment.indexOf('/') != -1) {
+        msg.innerHTML = "儲存失敗；註釋不可包含句號或斜線";
+        return;
+    } else {
+        msg.innerHTML = "";
+    }
 
     $.ajax({
       type: "POST",
       url: "screenshot/upload.php",
       data: { 
-         imgBase64: dataURL
+         imgBase64: dataURL,
+         comment: comment
       }
     }).done(function(o) {
-        let path = pathJoin(['screenshot', o.trim()]);
+      let path = pathJoin(['screenshot', o.trim()]);
       addImg(path);
     });
 }
 
 function addImg(path) {
-    var div = $('<div class="imgitem"></div>');
+    let commentStart = path.indexOf('-') + 1;
+    let commentEnd = path.lastIndexOf('.');
+    let comment = path.substr(commentStart, commentEnd - commentStart);
+    
+    var div = $('<div class="imgitemcontainer"></div>');
+    
+    var imgDiv = $('<div class="imgitem"></div>');
     var img = $('<img src="'+path+'">');
     var full_path = path.replace('thumbnail', 'img');
     var a = $('<a href="'+full_path+'" target="_blank"></a>');
-    $(a).append(img);
+    
+    var commentDiv = $('<div class="comment"></div>');
+    $(commentDiv).append(comment)
+    
+    $(imgDiv).append(img)
+    $(a).append(imgDiv);
     $(div).append(a);
+    $(div).append(commentDiv);
     $('#savedImages').prepend(div);
-    console.log()
 }
 
 init();
