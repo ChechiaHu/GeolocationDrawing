@@ -9,6 +9,7 @@
     $data = base64_decode($img);
     $id = uniqid();
     $file = UPLOAD_DIR . $id . '-' . $comment . '.png';
+    $file = iconv("utf-8", "cp950", $file);
     $success = file_put_contents($file, $data);
     thumbnail($file, THUMBNAIL_UPLOAD_DIR.$id.'-'.$comment.'.png', 250);
     print $success ? THUMBNAIL_UPLOAD_DIR.$id.'-'.$comment.'.png' : 'Unable to save the file.';
