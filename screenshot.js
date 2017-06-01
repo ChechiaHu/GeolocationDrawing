@@ -13,8 +13,10 @@ function init() {
     }).done(function(o) {
         o = JSON.parse(o);
         console.log(o['files']);
+        console.log(o['times']);
         o['files'].forEach(function(element, index, array) {
-            addImg("./screenshot/uploads/thumbnail/" + element);
+            let datestr = o['times'][index];
+            addImg("./screenshot/uploads/thumbnail/" + element, datestr);
         });
     });
 }
@@ -46,11 +48,12 @@ function screenshot() {
       }
     }).done(function(o) {
       let path = pathJoin(['screenshot', o.trim()]);
-      addImg(path);
+      let date = (new Date()).toTimeString()
+      addImg(path, date);
     });
 }
 
-function addImg(path) {
+function addImg(path, datestr) {
     let commentStart = path.indexOf('-') + 1;
     let commentEnd = path.lastIndexOf('.');
     let comment = path.substr(commentStart, commentEnd - commentStart);
@@ -64,6 +67,7 @@ function addImg(path) {
     
     var commentDiv = $('<div class="comment"></div>');
     $(commentDiv).append(comment)
+    $(commentDiv).append('<br>' + datestr)
     
     $(imgDiv).append(img)
     $(a).append(imgDiv);
