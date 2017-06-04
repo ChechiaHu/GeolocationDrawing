@@ -10,11 +10,19 @@ function addDataPoint(p) {
         gDataPoints.shift() // Remove first (oldest) element
     }
     gDataPoints.push(p); // Add new element
+<<<<<<< HEAD
 
     if (gDataPoints.length < 3) {
         return;
     }
 
+=======
+    
+    if (gDataPoints.length < 3) {
+        return;
+    }
+    
+>>>>>>> origin/master
     // Get the mean distance between adjacent points
     var meanSqDistance = 0;
     for (var i = 1; i < gDataPoints.length; ++i) {
@@ -30,7 +38,11 @@ function addDataPoint(p) {
         let dx = LOCATION_UPSCALE * (gDataPoints[i-1][0] - gDataPoints[i][0]);
         let dy = LOCATION_UPSCALE * (gDataPoints[i-1][1] - gDataPoints[i][1]);
         let sqDistance = dx*dx + dy*dy;
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> origin/master
         let inner = sqDistance - meanSqDistance;
         variance += inner*inner;
     }
@@ -41,6 +53,7 @@ function addDataPoint(p) {
 var watchID;
 
 if (navigator.geolocation) {
+<<<<<<< HEAD
     alert("GPS已定位成功，請按下確認鍵。");
     // 支援GPS地理定位
     navigator.geolocation.getCurrentPosition(geoYes, geoNo, { enableHighAccuracy: true, timeout: 500000 });
@@ -63,6 +76,30 @@ function geoYes(evt) {
     //str = "http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=300x300&sensor=false&center=" + evt.coords.latitude + "," + evt.coords.longitude;
     str = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBdXkqR9RYuoAUstYgivrJsMMdukIWcBNQ&callback=initMap"
     document.getElementById("map").src = str;
+=======
+	alert("GPS已被定位....千萬不可以動手!!!");
+	// 支援GPS地理定位
+	navigator.geolocation.getCurrentPosition(geoYes, geoNo, { enableHighAccuracy: true, timeout: 500000 });
+} else {
+	alert("目前GPS無法定位....趕快補刀吧!!!");
+}
+
+  function geoYes(evt) {
+		if (evt.coords === null) {
+		str = "evt.coords不存在";
+		document.getElementById("posStr").innerHTML = str;
+		return
+	}
+
+	str = "緯度" + evt.coords.latitude;
+	str += "<br />經度" + evt.coords.longitude;
+	str += "<br />精確度" + evt.coords.accuracy;
+	document.getElementById("posStr").innerHTML = str;
+
+	//str = "http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=300x300&sensor=false&center=" + evt.coords.latitude + "," + evt.coords.longitude;
+	str = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBdXkqR9RYuoAUstYgivrJsMMdukIWcBNQ&callback=initMap"
+	document.getElementById("map").src = str;
+>>>>>>> origin/master
 
     let point = [evt.coords.latitude, evt.coords.longitude];
     let lastPoint = gDataPoints[gDataPoints.length-2];
@@ -73,7 +110,11 @@ function geoYes(evt) {
         distanceSq = plpdx*plpdx + plpdy*plpdy;
     }
 
+<<<<<<< HEAD
     if (gDataPoints.length === 0) {
+=======
+	if (gDataPoints.length === 0) {
+>>>>>>> origin/master
         let canvas = document.getElementById("myCanvas");
         gLastPixel = [canvas.width / 2, canvas.height / 2];
     }
@@ -108,9 +149,15 @@ function geoYes(evt) {
             let context = canvas.getContext("2d");
 
             context.beginPath();
+<<<<<<< HEAD
             // console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
             context.moveTo(gLastPixel[0], gLastPixel[1]);
             // console.log("...to (" + pixelX + ", " + pixelY + ")")
+=======
+           // console.log("drawing from (" + pixelX + ", " + pixelY + ")...")
+            context.moveTo(gLastPixel[0], gLastPixel[1]);
+           // console.log("...to (" + pixelX + ", " + pixelY + ")")
+>>>>>>> origin/master
             context.lineTo(newPixel[0], newPixel[1]);
             context.stroke()
         }
@@ -120,6 +167,7 @@ function geoYes(evt) {
 }
 
 function geoNo(evt) {
+<<<<<<< HEAD
     alert("GPS取得失敗");
 }
 
@@ -134,6 +182,20 @@ function stopGPS() {
     //document.getElementById("watchStr").innerHTML = "畫筆停止嘍...！！";
     document.getElementById("watchStr1").innerHTML = "畫筆停止嘍...！！";
 
+=======
+	alert("GPS取得失敗");
+}
+
+function startGPS() {
+	watchID = navigator.geolocation.watchPosition(geoYes, geoNo);
+	document.getElementById("watchStr").innerHTML = "GPS正在監控中...";
+
+}
+
+function stopGPS() {
+	navigator.geolocation.clearWatch(watchID);
+	document.getElementById("watchStr").innerHTML = "GPS停止監控中...";
+>>>>>>> origin/master
 }
 
 function clearMap() {
@@ -141,7 +203,11 @@ function clearMap() {
     if (canvas.getContext) {
         let context = canvas.getContext("2d");
         context.clearRect(0, 0, canvas.width, canvas.height);
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> origin/master
         context.beginPath();
         context.fillStyle = "#FFFFFF";
         context.fillRect(0, 0, canvas.width, canvas.height);
@@ -150,4 +216,8 @@ function clearMap() {
         context.fill();
 
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/master

@@ -2,6 +2,7 @@
 <html>
 
 <head>
+<<<<<<< HEAD
     <meta charset="utf-8">
     <title>GPS 測試</title>
     <script type="text/javascript" src="geolocationDrawing.js"></script>
@@ -69,3 +70,65 @@
 </body>
 
 </html>
+=======
+  <meta charset="utf-8">
+  <title>GPS 測試</title>
+  <script type="text/javascript" src="geolocationDrawing.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="screenshot.js"></script>
+  <style type="text/css">
+    canvas {
+      border: 1px solid black;
+    }
+    .demo {
+      margin: 40px;
+    }
+    .imgitemcontainer {
+      width: 23%;
+      margin: 0 20px 20px 0;
+      display: inline-block;
+    }
+    .imgitem {
+      border: 1px black solid;
+    }
+    .imgitem img {
+      width: 100%;
+    }
+    .comment {
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+
+<body onload="clearMap();">
+  <h1>定位資訊 </h1>
+  <p id="posStr">111222</p>
+  <p id="watchStr">監控狀態</p>
+  <p>
+    <input type="button" value="啟動GPS更新" onClick="startGPS();">
+    <input type="button" value="停止GPS更新" onClick="stopGPS();">
+  </p>
+  <p>當啟動GPS更新,不用聯網也可持續更新!!!
+    <br> 只要網頁開著!
+  </p>
+  <hr>
+  <p id="posCoordinate">座標</p>
+  <p><img id="map" />
+  </p>
+  <canvas id="myCanvas" width="500" height="500"></canvas>
+  <p>
+    <input id="commentText" type="text">
+    <input type="button" value="儲存截圖" onClick="screenshot();">
+    <p id="screenshotButtonMsg"></p>
+  </p>
+
+  <div class="savedImages">
+    Files:
+    <div id="savedImages">
+    </div>
+  </div>
+
+</body>
+
+</html>
+>>>>>>> origin/master
