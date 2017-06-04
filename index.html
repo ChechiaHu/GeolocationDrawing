@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>GPS 測試</title>
+    <script type="text/javascript" src="geolocationDrawing.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="screenshot.js"></script>
+    <style type="text/css">
+        canvas {
+            border: 1px solid black;
+        }
+        .demo {
+            margin: 40px;
+        }
+        .imgitemcontainer {
+            width: 23%;
+            margin: 0 20px 20px 0;
+
+
+            display: inline-block;
+        }
+        .imgitem {
+            border: 1px black solid;
+        }
+        .imgitem img {
+            width: 100%;
+        }
+        .comment {
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body onload="clearMap();">
+<h1>大家把城市畫下來吧</h1>
+<!--<p id="posStr">111222</p>-->
+<!--<p id="watchStr">畫圖狀態：</p>-->
+<p id="watchStr1">畫圖狀態：</p>
+
+<!--<p>當啟動GPS更新,不用聯網也可持續更新!!!
+    <br> 只要網頁開著!-->
+</p>
+<hr>
+<!--<p id="posCoordinate">座標</p>-->
+
+<div style="margin: 20px; text-align: center"><canvas id="myCanvas" width="500" height="500"></canvas></div>
+<p>
+<div style="margin: 20px; text-align: center;"><input type="button" value="開始畫圖嘍！" onClick="startGPS();">
+    <input type="button" value="停止畫圖嘍！" onClick="stopGPS();"></div>
+</p>
+
+
+<p>
+
+    <div style="margin: 20px; text-align: center">​<textarea id="commentText" rows="10" cols="70">可以在這留下對自己作品的感受唷</textarea></div>
+    <div style="margin: 20px; text-align: center">​<input type="button" value="儲存截圖" onClick="screenshot();"></div>
+    <p id="screenshotButtonMsg"></p>
+</p>
+<hr>
+
+<div class="savedImages">
+    城市塗鴉牆:
+    <div id="savedImages">
+    </div>
+</div>
+
+</body>
+
+</html>
